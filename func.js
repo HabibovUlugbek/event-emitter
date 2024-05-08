@@ -9,6 +9,9 @@ const eventHandler = () => {
 
 // Register the event handler function with the 'myEvent' event
 eventEmitter.on('myEvent', eventHandler);
+eventEmitter.on('myEvent', eventHandler);
+eventEmitter.on('myEvent', eventHandler);
+
 
 // Emit the 'myEvent' event
 eventEmitter.emit('myEvent');
