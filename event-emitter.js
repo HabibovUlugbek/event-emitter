@@ -8,14 +8,37 @@ class EventEmitter {
         if (!this.events[eventName]) {
             this.events[eventName] = [];
         }
-        this.events[eventName].push(listener);
-        if (this.events[eventName].length > this.maxListeners) {
+        if (this.events[eventName].length >= this.maxListeners) {
             console.warn(`Max listeners (${this.maxListeners}) for event ${eventName} exceeded`);
+        } else {
+            this.events[eventName].push(listener);
         }
     }
 
     addListener(eventName, listener) {
         this.on(eventName, listener);
+    }
+
+    removeListener(eventName, listenerToRemove) {
+        const listeners = this.events[eventName];
+        if(listeners) {
+            const index = listeners.findIndex(listener => listener.toString() === listenerToRemove.toString());
+            if(index > -1) {
+                listeners.splice(index, 1);
+            } else {
+                console.warn(`Can't remove listener. Listener ${listenerToRemove} doesn't exist`);
+            }
+        }else {
+            console.warn(`Can't remove listener. Event ${eventName} doesn't exist`);
+        }
+    }
+
+    removeAllListeners(eventName) {
+        if(this.events[eventName]){
+            this.events[eventName] = [];
+        }else {
+            console.warn(`Can't remove listeners. Event ${eventName} doesn't exist`);
+        }
     }
 
     once(eventName, listener) {
@@ -30,18 +53,9 @@ class EventEmitter {
         const listeners = this.events[eventName];
         if (listeners) {
             listeners.forEach(listener => listener.apply(null, args));
+        }else {
+            console.warn(`Event doesn't exist`)
         }
-    }
-
-    removeListener(eventName, listenerToRemove) {
-        const listeners = this.events[eventName];
-        if (listeners) {
-            this.events[eventName] = listeners.filter(listener => listener !== listenerToRemove);
-        }
-    }
-
-    removeAllListeners(eventName) {
-        delete this.events[eventName];
     }
 
     off(eventName, listener) {
@@ -65,7 +79,9 @@ class EventEmitter {
     }
 
     setMaxListeners(n) {
-        this.maxListeners = n;
+        if(n<0) {
+            throw Error(`Max listeners numbers can't be negative`)
+        } else this.maxListeners = n;
     }
 }
 
